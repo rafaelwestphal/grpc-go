@@ -61,6 +61,16 @@ func (s) TestXDSClient_New(t *testing.T) {
 			wantErr: "no servers or authorities specified",
 		},
 		{
+			name: "invalid node metadata",
+			config: Config{
+				Node:             clients.Node{ID: "node-id", Metadata: map[string]any{"invalid": make(chan int)}},
+				ResourceTypes:    map[string]ResourceType{xdsresource.V3ListenerURL: listenerType},
+				TransportBuilder: grpctransport.NewBuilder(configs),
+				Servers:          []ServerConfig{{ServerIdentifier: clients.ServerIdentifier{ServerURI: "dummy-server"}}},
+			},
+			wantErr: "invalid node metadata",
+		},
+		{
 			name: "success with servers",
 			config: Config{
 				Node:             clients.Node{ID: "node-id"},

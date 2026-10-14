@@ -728,3 +728,38 @@ func (s) TestReportLoad_LoadReportInterval(t *testing.T) {
 	defer ssCancel()
 	loadStore1.Stop(ssCtx)
 }
+
+func (s) TestLRSClient_New(t *testing.T) {
+	configs := map[string]grpctransport.Config{"insecure": {Credentials: insecure.NewBundle()}}
+
+	tests := []struct {
+		name    string
+		config  lrsclient.Config
+		wantErr bool
+	}{
+		{
+			name: "invalid_node_metadata",
+			config: lrsclient.Config{
+				Node:             clients.Node{ID: "node-id", Metadata: map[string]any{"invalid": make(chan int)}},
+				TransportBuilder: grpctransport.NewBuilder(configs),
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid_node_metadata",
+			config: lrsclient.Config{
+				Node:             clients.Node{ID: "node-id", Metadata: map[string]any{"k1": "v1"}},
+				TransportBuilder: grpctransport.NewBuilder(configs),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := lrsclient.New(test.config)
+			if (err != nil) != test.wantErr {
+				t.Errorf("lrsclient.New(%+v) = %v, wantErr = %v", test.config, err, test.wantErr)
+			}
+		})
+	}
+}

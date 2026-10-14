@@ -230,10 +230,14 @@ func BuildXDSClientConfig(config *bootstrap.Config, metricsRecorder estats.Metri
 	}
 
 	node := config.Node()
+	var metadata map[string]any
+	if node.GetMetadata() != nil {
+		metadata = node.GetMetadata().AsMap()
+	}
 	gNode := clients.Node{
 		ID:               node.GetId(),
 		Cluster:          node.GetCluster(),
-		Metadata:         node.Metadata,
+		Metadata:         metadata,
 		UserAgentName:    node.UserAgentName,
 		UserAgentVersion: node.GetUserAgentVersion(),
 	}

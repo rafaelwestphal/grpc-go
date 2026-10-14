@@ -20,12 +20,24 @@
 package internal
 
 import (
+	"fmt"
+
 	"google.golang.org/grpc/internal/xds/clients"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v3corepb "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 )
+
+// ValidateNode validates the provided clients.Node configuration.
+func ValidateNode(n clients.Node) error {
+	if n.Metadata == nil {
+		return nil
+	}
+	if _, err := structpb.NewStruct(n.Metadata); err != nil {
+		return fmt.Errorf("invalid node metadata: %v", err)
+	}
+	return nil
+}
 
 // NodeProto returns a protobuf representation of clients.Node n.
 //
@@ -49,10 +61,11 @@ func NodeProto(n clients.Node) *v3corepb.Node {
 			if n.Metadata == nil {
 				return nil
 			}
-			if md, ok := n.Metadata.(*structpb.Struct); ok {
-				return proto.Clone(md).(*structpb.Struct)
+			md, err := structpb.NewStruct(n.Metadata)
+			if err != nil {
+				return nil
 			}
-			return nil
+			return md
 		}(),
 		UserAgentName:        n.UserAgentName,
 		UserAgentVersionType: &v3corepb.Node_UserAgentVersion{UserAgentVersion: n.UserAgentVersion},

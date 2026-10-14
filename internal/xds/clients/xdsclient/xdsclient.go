@@ -109,6 +109,9 @@ func New(config Config) (*XDSClient, error) {
 	case config.Authorities == nil && config.Servers == nil:
 		return nil, errors.New("xdsclient: no servers or authorities specified")
 	}
+	if err := clientsinternal.ValidateNode(config.Node); err != nil {
+		return nil, fmt.Errorf("xdsclient: %v", err)
+	}
 	if config.WatchExpiryTimeout == 0 {
 		config.WatchExpiryTimeout = defaultWatchExpiryTimeout
 	}

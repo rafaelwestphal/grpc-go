@@ -160,7 +160,7 @@ func (s) TestNodeProto(t *testing.T) {
 					Zone:    "zone",
 					SubZone: "sub_zone",
 				},
-				Metadata:         newStructProtoFromMap(t, map[string]any{"k1": "v1", "k2": 101, "k3": 280.0}),
+				Metadata:         map[string]any{"k1": "v1", "k2": 101, "k3": 280.0},
 				UserAgentName:    "user agent",
 				UserAgentVersion: "version",
 			},
@@ -207,6 +207,43 @@ func (s) TestNodeProto(t *testing.T) {
 			gotProto := NodeProto(test.inputNode)
 			if diff := cmp.Diff(test.wantProto, gotProto, protocmp.Transform()); diff != "" {
 				t.Fatalf("Unexpected diff in node proto: (-want, +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func (s) TestValidateNode(t *testing.T) {
+	tests := []struct {
+		name    string
+		node    clients.Node
+		wantErr bool
+	}{
+		{
+			name: "nil_metadata",
+			node: clients.Node{ID: "id"},
+		},
+		{
+			name: "valid_metadata",
+			node: clients.Node{
+				ID:       "id",
+				Metadata: map[string]any{"k1": "v1", "k2": 101, "k3": true},
+			},
+		},
+		{
+			name: "invalid_metadata",
+			node: clients.Node{
+				ID:       "id",
+				Metadata: map[string]any{"invalid": make(chan int)},
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := ValidateNode(test.node)
+			if (err != nil) != test.wantErr {
+				t.Errorf("ValidateNode(%+v) = %v, wantErr = %v", test.node, err, test.wantErr)
 			}
 		})
 	}

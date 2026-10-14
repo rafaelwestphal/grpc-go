@@ -63,6 +63,9 @@ func New(config Config) (*LRSClient, error) {
 	if config.TransportBuilder == nil {
 		return nil, errors.New("lrsclient: transport builder is nil")
 	}
+	if err := clientsinternal.ValidateNode(config.Node); err != nil {
+		return nil, fmt.Errorf("lrsclient: %v", err)
+	}
 
 	c := &LRSClient{
 		transportBuilder: config.TransportBuilder,
