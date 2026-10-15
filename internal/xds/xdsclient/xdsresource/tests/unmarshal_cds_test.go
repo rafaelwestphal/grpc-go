@@ -632,7 +632,8 @@ func (s) TestValidateCluster_LBPolicyInfo(t *testing.T) {
 	decoder := xdsresource.NewClusterResourceTypeDecoder(bootstrapCfg, map[xdsclient.ServerConfig]*bootstrap.ServerConfig{
 		xdsServerCfg: serverCfg,
 	})
-	res, err := decoder.Decode(xdsclient.NewAnyProto(testutils.MarshalAny(t, cluster)), xdsclient.DecodeOptions{ServerConfig: &xdsServerCfg})
+	anyCluster := testutils.MarshalAny(t, cluster)
+	res, err := decoder.Decode(&xdsclient.AnyProto{TypeURL: anyCluster.GetTypeUrl(), Value: anyCluster.GetValue()}, xdsclient.DecodeOptions{ServerConfig: &xdsServerCfg})
 	if err != nil {
 		t.Fatalf("decoder.Decode(%+v) failed: %v", cluster, err)
 	}

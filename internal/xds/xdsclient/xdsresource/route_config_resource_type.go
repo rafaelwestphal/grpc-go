@@ -43,7 +43,7 @@ func (d *routeConfigResourceDecoder) Decode(resource *xdsclient.AnyProto, opts x
 	if opts.ServerConfig != nil {
 		serverCfg = d.serverConfigs[*opts.ServerConfig]
 	}
-	name, rc, err := unmarshalRouteConfigResource(resource.ToAny(), d.bootstrapConfig, serverCfg)
+	name, rc, err := unmarshalRouteConfigResource(anyFromAnyProto(resource), d.bootstrapConfig, serverCfg)
 	if name == "" {
 		// Name is unset only when protobuf deserialization fails.
 		return nil, err

@@ -38,7 +38,7 @@ type endpointsResourceDecoder struct {
 }
 
 func (d *endpointsResourceDecoder) Decode(resource *xdsclient.AnyProto, _ xdsclient.DecodeOptions) (*xdsclient.DecodeResult, error) {
-	name, endpoints, err := unmarshalEndpointsResource(resource.ToAny())
+	name, endpoints, err := unmarshalEndpointsResource(anyFromAnyProto(resource))
 	if name == "" {
 		// Name is unset only when protobuf deserialization fails.
 		return nil, err

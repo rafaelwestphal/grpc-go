@@ -137,3 +137,10 @@ type DecodeResult struct {
 	// watched.
 	Resource ResourceData
 }
+
+func anyFromAnyProto(r *xdsclient.AnyProto) *anypb.Any {
+	return &anypb.Any{
+		TypeUrl: r.TypeURL,
+		Value:   r.Value,
+	}
+}

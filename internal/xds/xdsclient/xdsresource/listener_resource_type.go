@@ -41,7 +41,7 @@ func (d *listenerResourceDecoder) Decode(resource *xdsclient.AnyProto, opts xdsc
 	if opts.ServerConfig != nil {
 		serverCfg = d.serverConfigs[*opts.ServerConfig]
 	}
-	name, listener, err := unmarshalListenerResource(resource.ToAny(), d.bootstrapConfig, serverCfg)
+	name, listener, err := unmarshalListenerResource(anyFromAnyProto(resource), d.bootstrapConfig, serverCfg)
 	if name == "" {
 		// Name is unset only when protobuf deserialization fails.
 		return nil, err
